@@ -23,11 +23,13 @@ public class MainActivity extends Activity {
 		final String userUri 	= "http://adaptation/user";
 		final String contextUri = "http://adaptation/context";
 		final String deviceUri 	= "http://adaptation/device";
+		final String finalUIUri = "http://adaptation/finalui";
 		
 		Model model = ModelFactory.createDefaultModel();
 		
 		//User
 		Resource testUser = model.createResource(userUri);
+		
 		Property viewSize = model.createProperty("VIEW_SIZE");
 		Property output = model.createProperty("OUTPUT");
 		Property brightness = model.createProperty("BRIGHTNESS");
@@ -38,6 +40,7 @@ public class MainActivity extends Activity {
 		
 		//Context
 		Resource testContext = model.createResource(contextUri);
+		
 		Property temperature = model.createProperty("TEMPERATURE");
 		Property illuminance = model.createProperty("ILLUMINANCE");
 		
@@ -50,6 +53,14 @@ public class MainActivity extends Activity {
 		testDevice.addProperty(viewSize, "DEFAULT");
 		testDevice.addProperty(output, "DEFAULT");
 		testDevice.addProperty(brightness, "DEFAULT");
+		
+		//FinalConfiguration
+		Resource testFinalUI = model.createResource(finalUIUri);
+		
+		Property viewColor = model.createProperty("VIEW_COLOR");
+		
+		testFinalUI.addProperty(viewSize, "DEFAULT");
+		testFinalUI.addProperty(viewColor, "DEFAULT");
 	}
 
 	@Override

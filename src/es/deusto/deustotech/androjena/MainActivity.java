@@ -16,11 +16,17 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		generateModel();
+	}
+
+	private void generateModel() {
+		final String userUri 	= "http://adaptation/user";
+		final String contextUri = "http://adaptation/context";
+		final String deviceUri 	= "http://adaptation/device";
+		
 		Model model = ModelFactory.createDefaultModel();
 		
-		
-		final String userUri = "http://adaptation/user";
-		
+		//User
 		Resource testUser = model.createResource(userUri);
 		Property viewSize = model.createProperty("VIEW_SIZE");
 		Property output = model.createProperty("OUTPUT");
@@ -30,9 +36,7 @@ public class MainActivity extends Activity {
 		testUser.addProperty(output, "DEFAULT");
 		testUser.addProperty(brightness, "DEFAULT");
 		
-		
-		final String contextUri = "http://adaptation/context";
-		
+		//Context
 		Resource testContext = model.createResource(contextUri);
 		Property temperature = model.createProperty("TEMPERATURE");
 		Property illuminance = model.createProperty("ILLUMINANCE");
@@ -40,15 +44,12 @@ public class MainActivity extends Activity {
 		testContext.addProperty(temperature, "NORMAL");
 		testContext.addProperty(illuminance, "SUNLIGHT");
 		
-		
-		final String deviceUri = "http://adaptation/device";
-		
+		//Device
 		Resource testDevice = model.createResource(deviceUri);
 		
 		testDevice.addProperty(viewSize, "DEFAULT");
 		testDevice.addProperty(output, "DEFAULT");
 		testDevice.addProperty(brightness, "DEFAULT");
-		
 	}
 
 	@Override

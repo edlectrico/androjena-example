@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -19,14 +18,37 @@ public class MainActivity extends Activity {
 		
 		Model model = ModelFactory.createDefaultModel();
 		
-		String ns = "http://example.com/test";
 		
-		Resource r = model.createResource(ns + "r");
-		Property p = model.createProperty(ns + "p");
+		final String userUri = "http://adaptation/user";
 		
-		r.addProperty(p, "hello world!", XSDDatatype.XSDstring);
+		Resource testUser = model.createResource(userUri);
+		Property viewSize = model.createProperty("VIEW_SIZE");
+		Property output = model.createProperty("OUTPUT");
+		Property brightness = model.createProperty("BRIGHTNESS");
 		
-		model.write(System.out, "Turtle");
+		testUser.addProperty(viewSize, "DEFAULT");
+		testUser.addProperty(output, "DEFAULT");
+		testUser.addProperty(brightness, "DEFAULT");
+		
+		
+		final String contextUri = "http://adaptation/context";
+		
+		Resource testContext = model.createResource(contextUri);
+		Property temperature = model.createProperty("TEMPERATURE");
+		Property illuminance = model.createProperty("ILLUMINANCE");
+		
+		testContext.addProperty(temperature, "NORMAL");
+		testContext.addProperty(illuminance, "SUNLIGHT");
+		
+		
+		final String deviceUri = "http://adaptation/device";
+		
+		Resource testDevice = model.createResource(deviceUri);
+		
+		testDevice.addProperty(viewSize, "DEFAULT");
+		testDevice.addProperty(output, "DEFAULT");
+		testDevice.addProperty(brightness, "DEFAULT");
+		
 	}
 
 	@Override
@@ -37,3 +59,4 @@ public class MainActivity extends Activity {
 	}
 
 }
+

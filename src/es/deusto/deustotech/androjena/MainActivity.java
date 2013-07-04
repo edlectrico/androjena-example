@@ -29,42 +29,57 @@ public class MainActivity extends Activity {
 		Model model = ModelFactory.createDefaultModel();
 		
 		//User
-		Resource testUser = model.createResource(userUri);
+		Resource user = model.createResource(userUri);
 		
-		Property viewSize = model.createProperty("VIEW_SIZE");
 		Property output = model.createProperty("OUTPUT");
+		Property viewSize = model.createProperty("VIEW_SIZE");
 		Property brightness = model.createProperty("BRIGHTNESS");
 		
-		testUser.addProperty(viewSize, "DEFAULT");
-		testUser.addProperty(output, "DEFAULT");
-		testUser.addProperty(brightness, "DEFAULT");
+		user.addProperty(viewSize, "DEFAULT");
+		user.addProperty(output, "DEFAULT");
+		user.addProperty(brightness, "DEFAULT");
 		
 		//Context
-		Resource testContext = model.createResource(contextUri);
+		Resource context = model.createResource(contextUri);
 		
 		Property temperature = model.createProperty("TEMPERATURE");
 		Property illuminance = model.createProperty("ILLUMINANCE");
 		
-		testContext.addProperty(temperature, "NORMAL");
-		testContext.addProperty(illuminance, "SUNLIGHT");
+		context.addProperty(temperature, "NORMAL");
+		context.addProperty(illuminance, "SUNLIGHT");
 		
 		//Device
-		Resource testDevice = model.createResource(deviceUri);
+		Resource device = model.createResource(deviceUri);
 		
-		testDevice.addProperty(viewSize, "DEFAULT");
-		testDevice.addProperty(output, "DEFAULT");
-		testDevice.addProperty(brightness, "DEFAULT");
+		device.addProperty(viewSize, "DEFAULT");
+		device.addProperty(output, "DEFAULT");
+		device.addProperty(brightness, "DEFAULT");
 		
 		//FinalConfiguration
-		Resource testFinalUI = model.createResource(finalUIUri);
+		Resource finalUIConfiguration = model.createResource(finalUIUri);
 		
 		Property viewColor = model.createProperty("VIEW_COLOR");
 		
-		testFinalUI.addProperty(viewSize, "DEFAULT");
-		testFinalUI.addProperty(viewColor, "DEFAULT");
+		finalUIConfiguration.addProperty(viewSize, "DEFAULT");
+		finalUIConfiguration.addProperty(viewColor, "DEFAULT");
 	}
 
 	private void loadRules() {
+		/* if (user.output.equals("DEFAULT") || user.output.equals("HAPTIC")){
+		 * 		if (device.output.equals("DEFAULT") || device.output.equals("HAPTIC")){
+		 * 			if (user.viewSize.equals(device.viewSize)){
+		 * 				if (user.brightness.equals(device.brightness){
+		 * 					if (context.illuminance.notEquals(user.brightness){
+		 * 						finalUIConfiguration.setProperty(viewSize, BIG);
+		 * 						finalUIConfiguration.setProperty(viewColor, RED);
+		 * 					}
+		 * 				}
+		 * 			}
+		 * 		}
+		 * }
+		 * 
+		 */
+		
 		String rules = "[adaptViewSize: " +
 				"(?a http://www.w3.org/1999/02/22-rdf-syntax-ns#type ?x) " +
 				"(?x http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.w3.org/2002/07/owl#Class) " +

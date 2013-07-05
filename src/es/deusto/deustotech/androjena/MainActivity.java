@@ -2,94 +2,117 @@ package es.deusto.deustotech.androjena;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.InfModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.reasoner.Reasoner;
+import com.hp.hpl.jena.reasoner.rulesys.GenericRuleReasoner;
+import com.hp.hpl.jena.reasoner.rulesys.Rule;
 
 public class MainActivity extends Activity {
 
+	public static final String NS = "http://www.deustotech.es/prueba.owl#";
+	public OntModel ontModel = null;
+	public OntClass ontClass = null;
+	
+	Reasoner reasoner;
+	InfModel infModel;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		generateModel();
-		loadRules();
+		
+		reasoner = new GenericRuleReasoner(Rule.parseRules(loadRules()));
+		
+//		final String triples = "<http://www.deustotech.es/prueba.owl#edu> " +
+//				"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> " +
+//				"<http://www.deustotech.es/prueba.owl#User> . ";
+		executeRules(generateModel());
+		
+		Log.d("FIN", "FIN");
 	}
 
-	private void generateModel() {
-		final String userUri 	= "http://adaptation/user";
-		final String contextUri = "http://adaptation/context";
-		final String deviceUri 	= "http://adaptation/device";
-		final String finalUIUri = "http://adaptation/finalui";
+	private Model generateModel() {
 		
-		Model model = ModelFactory.createDefaultModel();
+//		Model data = ModelFactory.createDefaultModel();
+//		String triples = "<http://www.deustotech.es/prueba.owl#edu> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.deustotech.es/prueba.owl#User> . " +
+//						"<http://www.deustotech.es/prueba.owl#edu> <http://www.deustotech.es/prueba.owl#view_size> \"default\" . " +
+//						"";
+//		try {
+//			data.read(new ByteArrayInputStream(triples.getBytes("UTF-8")), null, "N-TRIPLES");
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return data;
 		
-		//User
-		Resource user = model.createResource(userUri);
+		this.ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		this.ontModel.setNsPrefix("prueba", NS);
 		
-		Property output = model.createProperty("OUTPUT");
-		Property viewSize = model.createProperty("VIEW_SIZE");
-		Property brightness = model.createProperty("BRIGHTNESS");
+		this.ontClass = ontModel.createClass(NS +"User");
 		
-		user.addProperty(viewSize, "DEFAULT");
-		user.addProperty(output, "DEFAULT");
-		user.addProperty(brightness, "DEFAULT");
+		addInstanceWithJena("edu");
 		
-		//Context
-		Resource context = model.createResource(contextUri);
+		this.ontModel.write(System.out);
 		
-		Property temperature = model.createProperty("TEMPERATURE");
-		Property illuminance = model.createProperty("ILLUMINANCE");
-		
-		context.addProperty(temperature, "NORMAL");
-		context.addProperty(illuminance, "SUNLIGHT");
-		
-		//Device
-		Resource device = model.createResource(deviceUri);
-		
-		device.addProperty(viewSize, "DEFAULT");
-		device.addProperty(output, "DEFAULT");
-		device.addProperty(brightness, "DEFAULT");
-		
-		//FinalConfiguration
-		Resource finalUIConfiguration = model.createResource(finalUIUri);
-		
-		Property viewColor = model.createProperty("VIEW_COLOR");
-		
-		finalUIConfiguration.addProperty(viewSize, "DEFAULT");
-		finalUIConfiguration.addProperty(viewColor, "DEFAULT");
+		return this.ontModel;
+	}
+	
+	public Individual addInstanceWithJena(String id) {
+		Individual individual = this.ontClass.createIndividual(NS + id);
+
+		Property viewSize = this.ontModel.getProperty(NS + "view_size");
+		Literal literal = this.ontModel.createTypedLiteral("default");
+		individual.setPropertyValue(viewSize, literal);
+
+		Property output = this.ontModel.getProperty(NS + "output");
+		literal = this.ontModel.createTypedLiteral("default");
+		individual.setPropertyValue(output, literal);
+
+		Property brightness = this.ontModel.getProperty(NS + "brightness");
+		literal = this.ontModel.createTypedLiteral("default");
+		individual.setPropertyValue(brightness, literal);
+
+		return individual;
 	}
 
-	private void loadRules() {
-		/* if (user.output.equals("DEFAULT") || user.output.equals("HAPTIC")){
-		 * 		if (device.output.equals("DEFAULT") || device.output.equals("HAPTIC")){
-		 * 			if (user.viewSize.equals(device.viewSize)){
-		 * 				if (user.brightness.equals(device.brightness){
-		 * 					if (context.illuminance.notEquals(user.brightness){
-		 * 						finalUIConfiguration.setProperty(viewSize, BIG);
-		 * 						finalUIConfiguration.setProperty(viewColor, RED);
-		 * 					}
-		 * 				}
-		 * 			}
-		 * 		}
-		 * }
-		 * 
-		 */
+	private String loadRules() {
 		
-		String rules = "[adaptViewSize: " +
-				"(?a http://www.w3.org/1999/02/22-rdf-syntax-ns#type ?x) " +
-				"(?x http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.w3.org/2002/07/owl#Class) " +
-				"(?t http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneTag) " + 
-				"notEqual(?a, ?t) notEqual(?a, http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneInstance) " +
-				" -> " +
-				"(http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneInstance http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneCall) " +
-				"(http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneInstance http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.lagunfc.com/ontologies/lagunfc.owl#Action) " +
-				"(http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneInstance http://www.lagunfc.com/ontologies/lagunfc.owl#hasAttribute ?a) " +
-				"(http://www.lagunfc.com/ontologies/lagunfc.owl#TelephoneInstance http://www.lagunfc.com/ontologies/lagunfc.owl#hasTag ?t)]";	
+		System.out.println("loadRules()");
+		
+		return "[adaptViewSize: " +
+				"print(\"0\") " +  
+				"(?u http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.deustotech.es/prueba.owl#User) " +
+				"(?u http://www.deustotech.es/prueba.owl#view_size ?vs) " +
+				"equal(?vs, \"default\") " +
+				
+				" -> " +  
+				
+				"(?u http://edu.ontology.es#mipropiedadfalsa \"se ha ejecutado\")] ";
+				//+ "print(?u, \"OK\")]";
+	}
+	
+	public void executeRules(Model dataModel) {
+			infModel = ModelFactory.createInfModel(reasoner, dataModel);
+			infModel.prepare();
+			
+			for (Statement st : infModel.listStatements().toList())
+			{
+				Log.d("InfModel", st.toString());
+			}
 	}
 	
 	@Override
